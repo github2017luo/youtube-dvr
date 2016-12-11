@@ -22,6 +22,7 @@ public class YoutubeDvrRunner extends Thread {
     public YoutubeDvrRunner(String youtubeUrl, String start, String end) throws Exception {
         this.youtubeUrl = youtubeUrl;
         this.start  = start;
+        this.end = end;
 
         System.out.print(MessageFormat.format("Record: {0}", youtubeUrl));
         if (start != null) {
@@ -97,6 +98,7 @@ public class YoutubeDvrRunner extends Thread {
             boolean isRecording = !pids.isEmpty();
 
             if (isRecording) {
+
                 if (filename != null) {
                     long size2 = 0;
 
