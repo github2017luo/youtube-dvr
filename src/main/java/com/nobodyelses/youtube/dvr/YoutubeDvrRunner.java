@@ -15,10 +15,25 @@ public class YoutubeDvrRunner extends Thread {
     private String youtubeUrl = "https://www.youtube.com/watch?v=Ga3maNZ0x0w";
     private String formatId = "95";
     private String start = null;
+    private String end = null;
 
-    public YoutubeDvrRunner(String youtubeUrl, String start) {
+    private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+
+    public YoutubeDvrRunner(String youtubeUrl, String start, String end) throws Exception {
         this.youtubeUrl = youtubeUrl;
         this.start  = start;
+
+        System.out.print(MessageFormat.format("Record: {0}", youtubeUrl));
+        if (start != null) {
+            Date date = sdf.parse(start);
+            System.out.print(MessageFormat.format(" at {0}", date));
+        }
+        if (end != null) {
+            Date date = sdf.parse(end);
+            System.out.print(MessageFormat.format(" end at {0}", date));
+        }
+
+        System.out.println();
     }
 
     @Override
@@ -138,19 +153,20 @@ public class YoutubeDvrRunner extends Thread {
             }
 
             if (!isRecording) {
-                Date date = new Date();
-                try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm");
-                    Date date2 = sdf.parse(start);
+                if (start != null) {
+                    Date date = new Date();
+                    try {
+                        Date date2 = sdf.parse(start);
 
-                    if (date2.after(date)) {
-                        System.out.print("-");
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e) {}
-                        continue;
+                        if (date2.after(date)) {
+                            System.out.print("-");
+                            try {
+                                Thread.sleep(5000);
+                            } catch (InterruptedException e) {}
+                            continue;
+                        }
+                    } catch (ParseException e2) {
                     }
-                } catch (ParseException e2) {
                 }
 
                 System.out.println();

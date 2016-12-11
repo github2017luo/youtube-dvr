@@ -8,10 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-import org.junit.Test;
+import junit.framework.TestCase;
 
-public class YoutubeDrvTest {
-    @Test
+public class YoutubeDrvTest extends TestCase {
     public void test() {
         while(true) {
             final YoutubeDvrRunner dvr = new YoutubeDvrRunner("https://www.youtube.com/watch?v=Ga3maNZ0x0w", "11/20/2016 17:58");
@@ -25,7 +24,6 @@ public class YoutubeDrvTest {
         }
     }
 
-    @Test
     public void testGet2() throws Exception {
         URL url = new URL("http://localhost:8888/youtube?uri=Testxyz&id=22");
         URLConnection conn = url.openConnection();
