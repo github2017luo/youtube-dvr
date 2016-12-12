@@ -11,9 +11,9 @@ import java.util.Scanner;
 import junit.framework.TestCase;
 
 public class YoutubeDrvTest extends TestCase {
-    public void test() {
+    public void test() throws Exception {
         while(true) {
-            final YoutubeDvrRunner dvr = new YoutubeDvrRunner("https://www.youtube.com/watch?v=Ga3maNZ0x0w", "11/20/2016 17:58");
+            final YoutubeDvrRunner dvr = new YoutubeDvrRunner("https://www.youtube.com/watch?v=Ga3maNZ0x0w", "11/20/2016 17:58", null);
 
             dvr.start();
 
