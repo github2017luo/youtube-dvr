@@ -1,0 +1,1 @@
+/usr/local/bin/youtube-dl --list-formats $1
