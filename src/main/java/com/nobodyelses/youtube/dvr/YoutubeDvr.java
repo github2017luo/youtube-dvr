@@ -24,7 +24,7 @@ public class YoutubeDvr {
 
     public void start(String youtubeUrl, String start, String end) throws Exception {
         while(true) {
-            final YoutubeDvrRunner2 dvr = new YoutubeDvrRunner2(youtubeUrl, start, end);
+            final YoutubeDvrRunner dvr = new YoutubeDvrRunner(youtubeUrl, start, end);
 
             dvr.start();
 

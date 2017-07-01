@@ -1,0 +1,1 @@
+/usr/local/bin/youtube-dl -f $1 -g $2
