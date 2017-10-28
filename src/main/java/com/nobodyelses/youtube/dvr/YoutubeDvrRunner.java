@@ -17,12 +17,17 @@ public class YoutubeDvrRunner extends Thread {
     private AtomicBoolean running = new AtomicBoolean(false);
     private String youtubeUrl = "https://www.youtube.com/watch?v=Ga3maNZ0x0w";
     private String formatId = "95";
+    private long remoteDate = 0;
     private String start = null;
     private String end = null;
+
+    private long startDate = 0;
 
     private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
 
     public YoutubeDvrRunner(String youtubeUrl, String start, String end) throws Exception {
+        this.startDate = System.currentTimeMillis();
+
         this.youtubeUrl = youtubeUrl;
         this.start  = start;
         this.end = end;
@@ -50,7 +55,7 @@ public class YoutubeDvrRunner extends Thread {
 
         while (running.get()) {
             try {
-                URL url2 = new URL("http://6-dot-nobodyelses-basic-application.appspot.com/youtube");
+                URL url2 = new URL("http://7-dot-nobodyelses-basic-application.appspot.com/youtube");
                 URLConnection conn2 = url2.openConnection();
                 InputStream is2 = conn2.getInputStream();
                 String string2 = convertStreamToString(is2);
@@ -70,16 +75,20 @@ public class YoutubeDvrRunner extends Thread {
                             youtubeUrl2 = "https://www.youtube.com/watch?v=" + value;
                         } else if ("format".equals(prop)) {
                             formatId2 = value;
+                        } else if ("date".equals(prop)) {
+                            remoteDate = Long.parseLong(value);
                         }
                     }
 
                     if (youtubeUrl2 != null && !youtubeUrl.equals(youtubeUrl2)) {
-                        youtubeUrl = youtubeUrl2;
-                        try {
-                            Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "killall ffmpeg"});
-                            Thread.sleep(2000);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if (remoteDate >= startDate) {
+                            youtubeUrl = youtubeUrl2;
+                            try {
+                                Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "killall ffmpeg"});
+                                Thread.sleep(2000);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
