@@ -49,43 +49,43 @@ public class YoutubeDvrRunner extends Thread {
         int count = 0;
 
         while (running.get()) {
-           try {
-               URL url2 = new URL("http://6-dot-nobodyelses-basic-application.appspot.com/youtube");
-               URLConnection conn2 = url2.openConnection();
-               InputStream is2 = conn2.getInputStream();
-               String string2 = convertStreamToString(is2);
+            try {
+                URL url2 = new URL("http://6-dot-nobodyelses-basic-application.appspot.com/youtube");
+                URLConnection conn2 = url2.openConnection();
+                InputStream is2 = conn2.getInputStream();
+                String string2 = convertStreamToString(is2);
 
-               if (string2 != null && string2.trim().length() > 0) {
-                   String[] split = string2.split("&");
+                if (string2 != null && string2.trim().length() > 0) {
+                    String[] split = string2.split("&");
 
-                   String youtubeUrl2 = null;
-                   String formatId2 = null;
+                    String youtubeUrl2 = null;
+                    String formatId2 = null;
 
-                   for (String s : split) {
-                       String[] split2 = s.split("=", 2);
-                       String prop = split2[0];
-                       String value = split2[1];
+                    for (String s : split) {
+                        String[] split2 = s.split("=", 2);
+                        String prop = split2[0];
+                        String value = split2[1];
 
-                       if ("uri".equals(prop)) {
-                           youtubeUrl2 = "https://www.youtube.com/watch?v=" + value;
-                       } else if ("format".equals(prop)) {
-                           formatId2 = value;
-                       }
-                   }
+                        if ("uri".equals(prop)) {
+                            youtubeUrl2 = "https://www.youtube.com/watch?v=" + value;
+                        } else if ("format".equals(prop)) {
+                            formatId2 = value;
+                        }
+                    }
 
-                   if (youtubeUrl2 != null && !youtubeUrl.equals(youtubeUrl2)) {
-                       youtubeUrl = youtubeUrl2;
-                       try {
-                           Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "killall ffmpeg"});
-                           Thread.sleep(2000);
-                       } catch (IOException e) {
-                           e.printStackTrace();
-                       }
-                   }
-               }
-           } catch (Exception e3) {
-               e3.printStackTrace();
-           }
+                    if (youtubeUrl2 != null && !youtubeUrl.equals(youtubeUrl2)) {
+                        youtubeUrl = youtubeUrl2;
+                        try {
+                            Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "killall ffmpeg"});
+                            Thread.sleep(2000);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } catch (Exception e3) {
+                e3.printStackTrace();
+            }
 
             ArrayList<Integer> pids = check("pgrep -i ffmpeg");
             boolean isRecording = !pids.isEmpty();
@@ -126,13 +126,13 @@ public class YoutubeDvrRunner extends Thread {
                         size = size2;
                         count = 0;
                     } else {
-                        // might have stopped
+// might have stopped
                         System.out.print("-");
                         System.out.print(size2);
 
                         count++;
 
-                        if (count > 10) {
+                        if (count > 5) {
                             size = 0;
                             isRecording = false;
                             count = 0;
@@ -268,7 +268,7 @@ public class YoutubeDvrRunner extends Thread {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                // ignore
+// ignore
             }
         }
     }
