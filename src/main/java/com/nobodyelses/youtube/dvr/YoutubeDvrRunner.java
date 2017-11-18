@@ -20,6 +20,7 @@ public class YoutubeDvrRunner extends Thread {
     private long remoteDate = 0;
     private String start = null;
     private String end = null;
+    private String streamUrl = null;
 
     private long startDate = 0;
 
@@ -55,6 +56,7 @@ public class YoutubeDvrRunner extends Thread {
 
         while (running.get()) {
             boolean killed = false;
+            boolean restarted = false;
 
             try {
                 URL url2 = new URL("http://7-dot-nobodyelses-basic-application.appspot.com/youtube");
@@ -84,11 +86,17 @@ public class YoutubeDvrRunner extends Thread {
 
                     if (remoteDate > startDate) {
                         killed = true;
+                        restarted = true;
                         count = 0;
                         filename = null;
                         size = 0;
                         startDate = remoteDate;
-                        youtubeUrl = youtubeUrl2;
+
+                        if (!youtubeUrl.equals(youtubeUrl2)) {
+                            youtubeUrl = youtubeUrl2;
+                            streamUrl = null;
+                        }
+
                         try {
                             Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "killall ffmpeg"});
                             Thread.sleep(2000);
@@ -150,6 +158,7 @@ public class YoutubeDvrRunner extends Thread {
                         if (count > 5) {
                             size = 0;
                             killed = false;
+                            streamUrl = null;
                             isRecording = false;
                             count = 0;
                             filename = null;
@@ -184,81 +193,6 @@ public class YoutubeDvrRunner extends Thread {
                 System.out.println();
                 print("Stream not recording.");
 
-                String pBest = null;
-                String p720 = null;
-                print("Starting recorder.");
-                try {
-                    print("List formats.");
-                    Process process = Runtime.getRuntime().exec(new String[] {"/usr/local/bin/youtube-dl", "--list-formats", youtubeUrl});
-                    InputStream source = process.getInputStream();
-                    Scanner scanner = new Scanner(source);
-                    try {
-                        while(scanner.hasNextLine()) {
-                            String line = scanner.nextLine();
-                            print(line);
-
-                            if (line.contains("(best)")) {
-                                pBest = line;
-                            }
-                            if (line.contains("mp4") && line.contains("720") && !line.contains("video only")) {
-                                p720 = line;
-                            }
-                        }
-                    } catch (Exception e) {
-                        print(e.getMessage());
-                    } finally {
-                        if (scanner != null) {
-                            scanner.close();
-                        }
-                    }
-                } catch (Exception e1) {
-                    print(e1.getMessage());
-                }
-
-                print("Best");
-                print(pBest);
-
-                print("720p");
-                print(p720);
-
-                if (p720 != null) {
-                    formatId = p720;
-                } else {
-                    formatId = pBest;
-                }
-
-                if (formatId == null) {
-                    formatId = "95";
-                }
-
-                String[] split = formatId.split("\\s+");
-                formatId = split[0];
-
-                StringBuilder buf = new StringBuilder();
-                try {
-                    print(MessageFormat.format("Get stream {0}...", formatId));
-                    Process process = Runtime.getRuntime().exec(new String[] {"/usr/local/bin/youtube-dl", "-f", formatId, "-g", youtubeUrl});
-                    InputStream source = process.getInputStream();
-                    Scanner scanner = new Scanner(source);
-                    try {
-                        while(scanner.hasNextLine()) {
-                            String line = scanner.nextLine();
-                            print(line);
-                            buf.append(line);
-                        }
-                    } catch (Exception e) {
-                        print(e.getMessage());
-                    } finally {
-                        if (scanner != null) {
-                            scanner.close();
-                        }
-                    }
-                } catch (Exception e1) {
-                    print(e1.getMessage());
-                }
-
-                String streamUrl = buf.toString();
-
                 print("Looking for available filename...");
                 int i = 0;
                 boolean isAvailable = false;
@@ -272,6 +206,10 @@ public class YoutubeDvrRunner extends Thread {
                     isAvailable = true;
                 }
                 print(MessageFormat.format("Recording to {0}.", filename));
+
+                if (streamUrl == null) {
+                    streamUrl = getStreamUrl();
+                }
 
                 try {
                     print("Starting stream...");
@@ -289,6 +227,84 @@ public class YoutubeDvrRunner extends Thread {
 // ignore
             }
         }
+    }
+
+    public String getStreamUrl() {
+        String pBest = null;
+        String p720 = null;
+        print("Starting recorder.");
+        try {
+            print("List formats.");
+            Process process = Runtime.getRuntime().exec(new String[] {"/usr/local/bin/youtube-dl", "--list-formats", youtubeUrl});
+            InputStream source = process.getInputStream();
+            Scanner scanner = new Scanner(source);
+            try {
+                while(scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    print(line);
+
+                    if (line.contains("(best)")) {
+                        pBest = line;
+                    }
+                    if (line.contains("mp4") && line.contains("720") && !line.contains("video only")) {
+                        p720 = line;
+                    }
+                }
+            } catch (Exception e) {
+                print(e.getMessage());
+            } finally {
+                if (scanner != null) {
+                    scanner.close();
+                }
+            }
+        } catch (Exception e1) {
+            print(e1.getMessage());
+        }
+
+        print("Best");
+        print(pBest);
+
+        print("720p");
+        print(p720);
+
+        if (p720 != null) {
+            formatId = p720;
+        } else {
+            formatId = pBest;
+        }
+
+        if (formatId == null) {
+            formatId = "95";
+        }
+
+        String[] split = formatId.split("\\s+");
+        formatId = split[0];
+
+        StringBuilder buf = new StringBuilder();
+        try {
+            print(MessageFormat.format("Get stream {0}...", formatId));
+            Process process = Runtime.getRuntime().exec(new String[] {"/usr/local/bin/youtube-dl", "-f", formatId, "-g", youtubeUrl});
+            InputStream source = process.getInputStream();
+            Scanner scanner = new Scanner(source);
+            try {
+                while(scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    print(line);
+                    buf.append(line);
+                }
+            } catch (Exception e) {
+                print(e.getMessage());
+            } finally {
+                if (scanner != null) {
+                    scanner.close();
+                }
+            }
+        } catch (Exception e1) {
+            print(e1.getMessage());
+        }
+
+        String streamUrl = buf.toString();
+        return streamUrl;
     }
 
     public static String convertStreamToString(final InputStream is) {
