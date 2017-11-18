@@ -207,9 +207,7 @@ public class YoutubeDvrRunner extends Thread {
                 }
                 print(MessageFormat.format("Recording to {0}.", filename));
 
-                if (streamUrl == null) {
-                    streamUrl = getStreamUrl();
-                }
+                streamUrl = getStreamUrl();
 
                 try {
                     print("Starting stream...");
