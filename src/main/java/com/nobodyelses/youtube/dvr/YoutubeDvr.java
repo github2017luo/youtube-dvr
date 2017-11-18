@@ -38,10 +38,10 @@ public class YoutubeDvr {
     private static String getUsage() {
         return new StringBuilder()
             .append("\nUsage:\n\n")
-            .append("$ java -cp src/main/java com.nobodyelses.youtube.dvr.YoutubeDvr <youtube url> [start date/time] [end date/time]\n\n")
+            .append("$ java -jar youtube-dvr-1.0-SNAPSHOT.jar <youtube url> [start date/time] [end date/time]\n\n")
             .append("Date/time format: MM/dd/yyyy hh:mm:ss\n\n")
             .append("Example:\n\n")
-            .append("java -cp src/main/java com.nobodyelses.youtube.dvr.YoutubeDvr https://www.youtube.com/watch?v=6C449GHTyt4\n\n")
+            .append("java -jar youtube-dvr-1.0-SNAPSHOT.jar https://www.youtube.com/watch?v=MkvS7UZglZU \"11/19/2017 08:00:00\"\n\n")
             .toString();
     }
 }

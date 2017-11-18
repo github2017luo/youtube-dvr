@@ -54,6 +54,8 @@ public class YoutubeDvrRunner extends Thread {
         int count = 0;
 
         while (running.get()) {
+            boolean killed = false;
+
             try {
                 URL url2 = new URL("http://7-dot-nobodyelses-basic-application.appspot.com/youtube");
                 URLConnection conn2 = url2.openConnection();
@@ -80,15 +82,18 @@ public class YoutubeDvrRunner extends Thread {
                         }
                     }
 
-                    if (youtubeUrl2 != null && !youtubeUrl.equals(youtubeUrl2)) {
-                        if (remoteDate >= startDate) {
-                            youtubeUrl = youtubeUrl2;
-                            try {
-                                Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "killall ffmpeg"});
-                                Thread.sleep(2000);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                    if (remoteDate > startDate) {
+                        killed = true;
+                        count = 0;
+                        filename = null;
+                        size = 0;
+                        startDate = remoteDate;
+                        youtubeUrl = youtubeUrl2;
+                        try {
+                            Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "killall ffmpeg"});
+                            Thread.sleep(2000);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -97,7 +102,8 @@ public class YoutubeDvrRunner extends Thread {
             }
 
             ArrayList<Integer> pids = check("pgrep -i ffmpeg");
-            boolean isRecording = !pids.isEmpty();
+            boolean isRecording = !killed && !pids.isEmpty();
+            killed = false;
 
             if (isRecording) {
 
@@ -143,8 +149,10 @@ public class YoutubeDvrRunner extends Thread {
 
                         if (count > 5) {
                             size = 0;
+                            killed = false;
                             isRecording = false;
                             count = 0;
+                            filename = null;
                             print(MessageFormat.format("Stream stopped: {0}", filename));
                             try {
                                 Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "killall ffmpeg"});
@@ -249,6 +257,8 @@ public class YoutubeDvrRunner extends Thread {
                     print(e1.getMessage());
                 }
 
+                String streamUrl = buf.toString();
+
                 print("Looking for available filename...");
                 int i = 0;
                 boolean isAvailable = false;
@@ -263,7 +273,6 @@ public class YoutubeDvrRunner extends Thread {
                 }
                 print(MessageFormat.format("Recording to {0}.", filename));
 
-                String streamUrl = buf.toString();
                 try {
                     print("Starting stream...");
                     count = 0;
