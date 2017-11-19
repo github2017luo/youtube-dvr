@@ -158,7 +158,6 @@ public class YoutubeDvrRunner extends Thread {
                         if (count > 5) {
                             size = 0;
                             killed = false;
-                            streamUrl = null;
                             isRecording = false;
                             count = 0;
                             filename = null;
@@ -174,6 +173,8 @@ public class YoutubeDvrRunner extends Thread {
             }
 
             if (!isRecording) {
+                count = 0;
+                size = 0;
                 if (start != null) {
                     Date date = new Date();
                     try {
@@ -207,7 +208,10 @@ public class YoutubeDvrRunner extends Thread {
                 }
                 print(MessageFormat.format("Recording to {0}.", filename));
 
-                streamUrl = getStreamUrl();
+                // Always get a new stream url because it goes stale and stops stream at some point.
+                // if (streamUrl == null) {
+                    streamUrl = getStreamUrl();
+                // }
 
                 try {
                     print("Starting stream...");
